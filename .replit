@@ -1,0 +1,18 @@
+run = "python telegram_perplexity_bot.py"
+language = "python3"
+
+[nix]
+channel = "stable-22_11"
+
+[env]
+PYTHONPATH = "."
+PYTHONFAULTHANDLER = "1"
+
+[packager]
+language = "python3"
+ignoredPackages = ["unit_tests"]
+
+[packager.features]
+enabledForHosting = true
+packageSearch = true
+guessImports = true 

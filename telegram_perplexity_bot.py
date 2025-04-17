@@ -397,13 +397,9 @@ def main() -> None:
     # Run the bot with error handling
     logger.info("Starting bot...")
     try:
-        # Set higher timeouts
+        # Use simpler polling parameters that work across versions
         application.run_polling(
-            allowed_updates=Update.ALL_TYPES,
-            connect_timeout=30,
-            read_timeout=30,
-            write_timeout=30,
-            pool_timeout=30
+            allowed_updates=Update.ALL_TYPES
         )
     except (TimedOut, NetworkError) as e:
         logger.error(f"Network error: {e}")
