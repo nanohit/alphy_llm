@@ -1,0 +1,13 @@
+services:
+  - type: worker # Use 'worker' for polling bots as they don't expose a web server
+    name: telegram-perplexity-bot
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python telegram_perplexity_bot.py"
+    envVars:
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false # Mark as external secret
+      - key: PERPLEXITY_API_KEY
+        sync: false # Mark as external secret
+      - key: PYTHON_VERSION
+        value: 3.11 # Specify a Python version if needed 
