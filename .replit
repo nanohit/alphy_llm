@@ -1,15 +1,15 @@
 run = "python telegram_perplexity_bot.py"
 language = "python3"
+entrypoint = "telegram_perplexity_bot.py"
+hidden = [".env", ".gitignore", ".git"]
 
 [nix]
 channel = "stable-22_11"
 
 [env]
-PYTHONPATH = "."
-PYTHONFAULTHANDLER = "1"
+PYTHONPATH = "$PYTHONPATH:/home/runner/${REPL_SLUG}"
 
 [packager]
-language = "python3"
 ignoredPackages = ["unit_tests"]
 
 [packager.features]

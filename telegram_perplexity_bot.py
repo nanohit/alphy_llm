@@ -20,6 +20,8 @@ from telegram import Update
 from telegram.constants import ParseMode
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from telegram.error import TimedOut, NetworkError, TelegramError
+# Import keep_alive module for Replit
+from keep_alive import keep_alive
 
 # Load environment variables from .env file
 load_dotenv()
@@ -418,4 +420,6 @@ def main() -> None:
         logger.info("Bot stopped")
 
 if __name__ == "__main__":
+    # Run keep_alive function to keep the bot running on Replit
+    keep_alive()
     main() 
