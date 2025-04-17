@@ -16,8 +16,9 @@ import requests
 import time
 import json
 from dotenv import load_dotenv
-from telegram import ParseMode
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from telegram import Update
+from telegram.constants import ParseMode
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from telegram.error import TimedOut, NetworkError, TelegramError
 
 # Load environment variables from .env file
@@ -75,26 +76,26 @@ def estimate_tokens(messages: list[dict]) -> int:
     # Approximation: 1 token ~ 4 characters
     return total_chars // 4
 
-async def start(update, context: CallbackContext) -> None:
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /start is issued and clear history."""
     user = update.effective_user
     # Clear history on start
     context.chat_data.pop('history', None)
     await update.message.reply_text(GREETING_MESSAGE.format(user.first_name))
 
-async def restart(update, context: CallbackContext) -> None:
+async def restart(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send the greeting message again when the command /restart is issued and clear history."""
     user = update.effective_user
     # Clear history on restart
     context.chat_data.pop('history', None)
     await update.message.reply_text(GREETING_MESSAGE.format(user.first_name))
 
-async def clear_command(update, context: CallbackContext) -> None:
+async def clear_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Clears the conversation history for the current chat."""
     context.chat_data.pop('history', None)
     await update.message.reply_text("Conversation history cleared.")
 
-async def help_command(update, context: CallbackContext) -> None:
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /help is issued."""
     await update.message.reply_text(
         "I'm an AI assistant powered by Perplexity's Sonar model, maintaining conversation history.\n\n"
@@ -107,7 +108,7 @@ async def help_command(update, context: CallbackContext) -> None:
         "/stats - Show usage statistics and estimated costs"
     )
 
-async def stats_command(update, context: CallbackContext) -> None:
+async def stats_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send usage statistics and estimated costs."""
     stats_message = (
         "📊 **Usage Statistics**\n\n"
@@ -216,7 +217,7 @@ def truncate_text(text, max_length=MAX_OUTPUT_LENGTH):
     # If no good break point, truncate at max_length
     return text[:max_length] + "\n\n*[Response truncated due to length...]*"
 
-async def handle_message(update, context: CallbackContext) -> None:
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Process user messages, maintain history, handle potential reset, and respond."""
     user_message = update.message.text
     chat_id = update.effective_chat.id
@@ -382,25 +383,28 @@ async def handle_message(update, context: CallbackContext) -> None:
 
 def main() -> None:
     """Start the bot."""
-    # Create the Updater and pass it your bot's token
-    updater = Updater(TELEGRAM_BOT_TOKEN)
-
-    # Get the dispatcher to register handlers
-    dispatcher = updater.dispatcher
+    # Create the Application with increased connection pool
+    application = Application.builder().token(TELEGRAM_BOT_TOKEN).connection_pool_size(8).build()
 
     # Add handlers
-    dispatcher.add_handler(CommandHandler("start", start))
-    dispatcher.add_handler(CommandHandler("restart", restart))
-    dispatcher.add_handler(CommandHandler("help", help_command))
-    dispatcher.add_handler(CommandHandler("stats", stats_command))
-    dispatcher.add_handler(CommandHandler("clear", clear_command))
-    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("restart", restart))
+    application.add_handler(CommandHandler("help", help_command))
+    application.add_handler(CommandHandler("stats", stats_command))
+    application.add_handler(CommandHandler("clear", clear_command)) # Add handler for /clear
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
-    # Start the Bot
+    # Run the bot with error handling
     logger.info("Starting bot...")
     try:
-        updater.start_polling()
-        updater.idle()
+        # Set higher timeouts
+        application.run_polling(
+            allowed_updates=Update.ALL_TYPES,
+            connect_timeout=30,
+            read_timeout=30,
+            write_timeout=30,
+            pool_timeout=30
+        )
     except (TimedOut, NetworkError) as e:
         logger.error(f"Network error: {e}")
         logger.info("Restarting bot...")
