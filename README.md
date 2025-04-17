@@ -1,37 +1,33 @@
-# Alphy Telegram Bot
+# Alphy - Telegram Bot with Perplexity AI
 
-A Telegram bot powered by Perplexity's Sonar model that maintains conversation history and provides informative responses.
+This repository contains a Telegram bot that uses Perplexity AI's Sonar model to respond to user messages. The bot maintains conversation history for each chat and provides contextual responses.
 
 ## Features
 
-- Responds to user queries using Perplexity's Sonar model
-- Maintains conversation history for contextual responses
-- Handles basic interactions directly (greetings, farewells, etc.)
-- Automatically resets conversation when it becomes too long
-- Tracks usage statistics and estimated costs
+- Integration with Perplexity AI Sonar model
+- Conversation history management
+- Automatic history trimming when limits are reached
+- Local handling of common queries for faster responses
+- Multi-language support (English and Russian)
+- Usage statistics tracking
+
+## Deployment
+
+This bot is configured to be deployed on Render.com using the included `render.yaml` file.
+
+## Environment Variables
+
+The following environment variables need to be set:
+
+- `TELEGRAM_BOT_TOKEN`: Your Telegram Bot API token
+- `PERPLEXITY_API_KEY`: Your Perplexity AI API key
 
 ## Setup
 
 1. Clone this repository
-2. Install dependencies: `pip install -r requirements.txt`
-3. Create a `.env` file with the following variables:
-   ```
-   TELEGRAM_BOT_TOKEN=your_telegram_bot_token
-   PERPLEXITY_API_KEY=your_perplexity_api_key
-   ```
+2. Install the required dependencies: `pip install -r requirements.txt`
+3. Set up the environment variables
 4. Run the bot: `python telegram_perplexity_bot.py`
-
-## Deployment
-
-This project is configured for deployment on Render.com using the included `render.yaml` file.
-
-## Commands
-
-- `/start` - Start a new conversation (clears history)
-- `/restart` - Restart the conversation (clears history)
-- `/clear` - Clear the current conversation history
-- `/help` - Show help message
-- `/stats` - Show usage statistics and estimated costs
 
 ## Prerequisites
 
@@ -62,8 +58,8 @@ This project is configured for deployment on Render.com using the included `rend
 
 5. Edit the `.env` file and add your Telegram bot token and Perplexity API key
    ```
-   TELEGRAM_BOT_TOKEN=your_telegram_bot_token
-   PERPLEXITY_API_KEY=your_perplexity_api_key
+   TELEGRAM_BOT_TOKEN=your_telegram_bot_token_here
+   PERPLEXITY_API_KEY=your_perplexity_api_key_here
    ```
 
 ## How to Get API Keys
